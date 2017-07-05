@@ -15,14 +15,32 @@ def statistic(k, l, count):
     res2 = str(k) + ' Просмотров'
     return res1, res2
 
+def ipfilter(ip, iplist):
+    res = True
+    for i in iplist:
+        if ip == i:
+            res = False
+            break
+    return res
+    
+def validationip():
+    driver.set_window_size(100, 100)
+    driver.get('http://www.showmyip.gr/')
+    ipconf = driver.find_element_by_class_name('ip_address')
+    ip = ipconf.text
+    res = ipfilter(ip, usediplist)  
+    usediplist.append(ip)
+    return res
+
 count = 0
 k = 0
+usediplist = []
 name = "Not so fast"
 dict = {'Как сделать арбузный сок / My Watermelon Juice': ['Как сделать арбузный сок not so fast', 'My Watermelon Juice not so fast', 'Как сделать арбузный сок / My Watermelon Juice'], 
         'Kinetic Sand / Кинетический песок': ['Kinetic Sand / Кинетический песок', 'Kinetic Sand not so fast', 'Кинетический песок not so fast'], 
         'Крахмал и вода - неньтоновская жидкость/ Non-Newtonian fluid': ['Крахмал и вода - неньтоновская жидкость/ Non-Newtonian fluid', 'Крахмал и вода - неньтоновская жидкость not so fast', 'Non-Newtonian fluid not so fast']}
 d = dict
-l = 10 #int(input('Введите  количество цыклов: '))
+l = 1000 #int(input('Введите  количество цыклов: '))
 for c in range(0, l):
     key = d.keys()
     z = []
@@ -34,7 +52,12 @@ for c in range(0, l):
     serchtext = (d[namevideo][random.randint(0, a-1)])
     try:
         with TorBrowserDriver("/home/serj/selenium/tor-browser_en-US") as driver:
-            driver.get('https://www.youtube.com/')
+            res = validationip()
+            if res == True:
+                driver.set_window_size(1300, 760)
+                driver.get('https://www.youtube.com/')
+            else:
+                driver.close
             time.sleep(random.randint(2, 5))
             try:
                 serch = driver.find_element_by_id('masthead-search-term')
