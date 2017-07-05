@@ -1,28 +1,44 @@
-from selenium import webdriver
+import os
 import random
+from selenium import webdriver
+from collections import Counter
+from tbselenium.tbdriver import TorBrowserDriver
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.chrome.options import Options
-import urllib.request, time
-from urllib.request import Request, urlopen
-import urllib.request, urllib.error, time, random, time, asyncio, os
 
-useragent=[]
-usag = urllib.request.urlopen("http://willdrevo.com/public/text/user_agents.txt").read()
-with open ("user_agent.doc", "wb") as f:
-    f.write(usag)
-    f.close()
-f = open("user_agent.doc", "r")
-for line in f.readlines():
-    useragent.append(line[1: len(line)-2])
-    f.close()
-for i in range(0,1000): 
-    g = str(random.choice(useragent))
-    print(g)    
-    opts = Options()
-    opts.add_argument("user-agent="+ g)
-    driver = webdriver.Chrome('/usr/bin/google-chrome-stable')
-    driver.implicitly_wait(random.randint(20, 25))
-    driver.get('http://browser-info.ru/')
-#   driver.set_window_size(100, 100)
-    link1 = driver.find_elements_by_id('adContent-clickOverlay')
-    driver.quit()
+# Обьявляем элементы
+array = []
+i = 0
+urllist = []
+print('---***Вас приветствует програмка NAVRATIL***---\n')
+print('Программа создана просмативать заданное количество страниц на YouTube \n заданное количество раз заходя под разными ip адресом \n')
+# Создаем список страниц
+while True:
+    comand = str(input('Введите адрес страницы или "start" для начала DDos атаки: '))
+    if comand == 'start':
+        print('В список добавлены следующие ссылки: \n%s.' % ', \n'.join(urllist))
+        break
+    else:
+        urllist.append(comand)
+    print('Добавлено в список')
+# Воодим остальные данные
+q = int(input('Введите количество просмотров для всех страниц: '))
+time = int(input('Введите время просмотра на страницы: ' )) 
+#Начинаем цикл 
+while i < q:
+    with TorBrowserDriver("/home/serj/selenium/tor-browser_en-US/") as driver:
+        driver.set_window_size(100, 100)
+        driver.get(random.choice(urllist))
+        titleserch = driver.find_element_by_id('eow-title')
+        title = titleserch.text
+        array.append(title)
+        realtime = str(time + random.randint(1, 15)) # рандомим время
+        driver.implicitly_wait(realtime) # Ждем
+        link1 = driver.find_elements_by_id('adContent-clickOverlay')
+        i +=1
+        print('Выполнение ' + str (i/q*100) + ' % ' + ' Просмотр страницы - '+ str(title)+ ' - ' + str(realtime)+ 'сек.') #Результат ожидания
+        driver.close() #И заново
+#Выводим какую то статистику
+print('DDoS атака завершена \n ')
+abc = Counter(array)
+for key, value in abc.items():
+        print('Страница "' + str(key) + '"Ы просмотров ' + str(value))
