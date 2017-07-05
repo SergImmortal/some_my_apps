@@ -7,7 +7,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 
 # Обьявляем элементы
 array = []
-i = 0
 urllist = []
 print('---***Вас приветствует програмка NAVRATIL***---\n')
 print('Программа создана просмативать заданное количество страниц на YouTube \n заданное количество раз заходя под разными ip адресом \n')
@@ -24,20 +23,24 @@ while True:
 q = int(input('Введите количество просмотров для всех страниц: '))
 time = int(input('Введите время просмотра на страницы: ' )) 
 #Начинаем цикл 
-while i < q:
+for i in range(0, q):
     with TorBrowserDriver("/home/serj/selenium/tor-browser_en-US/") as driver:
         driver.set_window_size(100, 100)
-        driver.get(random.choice(urllist))
-        titleserch = driver.find_element_by_id('eow-title')
-        title = titleserch.text
-        array.append(title)
-        realtime = str(time + random.randint(1, 15)) # рандомим время
-        driver.implicitly_wait(realtime) # Ждем
-        link1 = driver.find_elements_by_id('adContent-clickOverlay')
-        i +=1
-        print('Выполнение ' + str (i/q*100) + ' % ' + ' Просмотр страницы - '+ str(title)+ ' - ' + str(realtime)+ 'сек.') #Результат ожидания
+        random.shuffle(urllist)
+        for i in urllist:
+            driver.get(i)
+            try:
+                titleserch = driver.find_element_by_id('eow-title')
+                title = titleserch.text
+                array.append(title)
+                realtime = str(time + random.randint(1, 15)) # рандомим время
+                driver.implicitly_wait(realtime) # Ждем
+                link1 = driver.find_elements_by_id('adContent-clickOverlay')
+                print('Выполнение ' + str (i/q*100) + ' % ' + ' Просмотр страницы - '+ str(title)+ ' - ' + str(realtime)+ 'сек.') #Результат ожидания
+            except:
+                print('Oшибка')
         driver.close() #И заново
-#Выводим какую то статистику
+#Выводим статистику
 print('DDoS атака завершена \n ')
 abc = Counter(array)
 for key, value in abc.items():
