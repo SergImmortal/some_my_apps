@@ -10,28 +10,6 @@ def statusbar(x, y):
     r = round(r, 2)
     return r
 
-def listcreate():
-    urllist = []
-    # Создаем список страниц
-    while True:
-        comand = str(input('Введите несколько поисковых запросов или start для начала: '))
-        if comand == 'start':
-            print('В список добавлены следующие запросы: \n%s.' % ', \n'.join(urllist))
-            break
-        else:
-            urllist.append(comand)
-            print('Добавлено в список')
-    return urllist
-"""
-Поисковые запрос:
-my watermelon juice not so fast - накрылся
-not so fast my watermelon juice -накрылся
-как сделать арбузный сок / fast - накрылся
-fast как сделать арбузный сок  +
-fast 100% арбузный сок +
-100% so fast watermelon juice - накрылся
-"""
-
 def statistic(k, l, count):
     res1 = str(statusbar(l, count)) + ' %'  
     res2 = str(k) + ' Просмотров'
@@ -39,22 +17,33 @@ def statistic(k, l, count):
 
 count = 0
 k = 0
-name = "Not so fast" #str(input('Введите  назване канала: '))
-serchtext = listcreate()
-namevideo = "Как сделать арбузный сок / My Watermelon Juice"  #str(input('Введите  имя видео: '))
-l = 3000 #int(input('Введите  количество цыклов: '))
+name = "Not so fast"
+dict = {'Как сделать арбузный сок / My Watermelon Juice': ['Как сделать арбузный сок not so fast', 'My Watermelon Juice not so fast', 'Как сделать арбузный сок / My Watermelon Juice'], 
+        'Kinetic Sand / Кинетический песок': ['Kinetic Sand / Кинетический песок', 'Kinetic Sand not so fast', 'Кинетический песок not so fast'], 
+        'Крахмал и вода - неньтоновская жидкость/ Non-Newtonian fluid': ['Крахмал и вода - неньтоновская жидкость/ Non-Newtonian fluid', 'Крахмал и вода - неньтоновская жидкость not so fast', 'Non-Newtonian fluid not so fast']}
+d = dict
+l = 10 #int(input('Введите  количество цыклов: '))
 for c in range(0, l):
+    key = d.keys()
+    z = []
+    for i in key:
+        z.append(i)
+    namevideo = str(random.choice(z))
+    a = d.get(namevideo)
+    a = int(len(a))
+    serchtext = (d[namevideo][random.randint(0, a-1)])
     try:
-        with TorBrowserDriver("/home/serg/selenium/tor-browser_en-US") as driver:
+        with TorBrowserDriver("/home/serj/selenium/tor-browser_en-US") as driver:
             driver.get('https://www.youtube.com/')
             time.sleep(random.randint(2, 5))
             try:
                 serch = driver.find_element_by_id('masthead-search-term')
-                serch.send_keys(str(random.choice(serchtext)))
+                serch.send_keys(serchtext)
                 klikforserch = driver.find_element_by_id('search-btn')
                 time.sleep(random.randint(2, 7))
                 klikforserch.click()
                 serchvideo = driver.find_element_by_link_text(namevideo)
+                driver.implicitly_wait(20)
                 time.sleep(random.randint(2, 7))
                 serchvideo.click()
                 time.sleep(random.randint(20, 70))
