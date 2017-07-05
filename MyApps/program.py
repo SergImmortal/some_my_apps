@@ -1,47 +1,78 @@
-import os
-import random
 from selenium import webdriver
-from collections import Counter
+import random
+import time
 from tbselenium.tbdriver import TorBrowserDriver
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
-# Обьявляем элементы
-array = []
-urllist = []
-print('---***Вас приветствует програмка NAVRATIL***---\n')
-print('Программа создана просмативать заданное количество страниц на YouTube \n заданное количество раз заходя под разными ip адресом \n')
-# Создаем список страниц
-while True:
-    comand = str(input('Введите адрес страницы или "start" для начала DDos атаки: '))
-    if comand == 'start':
-        print('В список добавлены следующие ссылки: \n%s.' % ', \n'.join(urllist))
-        break
-    else:
-        urllist.append(comand)
-    print('Добавлено в список')
-# Воодим остальные данные
-q = int(input('Введите количество просмотров для всех страниц: '))
-time = int(input('Введите время просмотра на страницы: ' )) 
-#Начинаем цикл 
-for i in range(0, q):
-    with TorBrowserDriver("/home/serj/selenium/tor-browser_en-US/") as driver:
-        driver.set_window_size(100, 100)
-        random.shuffle(urllist)
-        for i in urllist:
-            driver.get(i)
+def statusbar(x, y):
+    r = (y/x)*100
+    r = round(r, 2)
+    return r
+
+def listcreate():
+    urllist = []
+    # Создаем список страниц
+    while True:
+        comand = str(input('Введите несколько поисковых запросов или start для начала: '))
+        if comand == 'start':
+            print('В список добавлены следующие запросы: \n%s.' % ', \n'.join(urllist))
+            break
+        else:
+            urllist.append(comand)
+            print('Добавлено в список')
+    return urllist
+"""
+Поисковые запрос:
+my watermelon juice not so fast - накрылся
+not so fast my watermelon juice -накрылся
+как сделать арбузный сок / fast - накрылся
+fast как сделать арбузный сок  +
+fast 100% арбузный сок +
+100% so fast watermelon juice - накрылся
+"""
+
+def statistic(k, l, count):
+    res1 = str(statusbar(l, count)) + ' %'  
+    res2 = str(k) + ' Просмотров'
+    return res1, res2
+
+count = 0
+k = 0
+name = "Not so fast" #str(input('Введите  назване канала: '))
+serchtext = listcreate()
+namevideo = "Как сделать арбузный сок / My Watermelon Juice"  #str(input('Введите  имя видео: '))
+l = 3000 #int(input('Введите  количество цыклов: '))
+for c in range(0, l):
+    try:
+        with TorBrowserDriver("/home/serg/selenium/tor-browser_en-US") as driver:
+            driver.get('https://www.youtube.com/')
+            time.sleep(random.randint(2, 5))
             try:
-                titleserch = driver.find_element_by_id('eow-title')
-                title = titleserch.text
-                array.append(title)
-                realtime = str(time + random.randint(1, 15)) # рандомим время
-                driver.implicitly_wait(realtime) # Ждем
-                link1 = driver.find_elements_by_id('adContent-clickOverlay')
-                print('Выполнение ' + str (i/q*100) + ' % ' + ' Просмотр страницы - '+ str(title)+ ' - ' + str(realtime)+ 'сек.') #Результат ожидания
+                serch = driver.find_element_by_id('masthead-search-term')
+                serch.send_keys(str(random.choice(serchtext)))
+                klikforserch = driver.find_element_by_id('search-btn')
+                time.sleep(random.randint(2, 7))
+                klikforserch.click()
+                serchvideo = driver.find_element_by_link_text(namevideo)
+                time.sleep(random.randint(2, 7))
+                serchvideo.click()
+                time.sleep(random.randint(20, 70))
+                k += 1
+                for g in range(0, random.randint(2, 5)):
+                    try:
+                        linksss = driver.find_elements_by_xpath("//*[@class='g-hovercard']")
+                        for i in linksss:
+                            if i.text == name:
+                                k += 1
+                                i.click()
+                                time.sleep(random.randint(20, 70))
+                    except:
+                        rf = 0
             except:
-                print('Oшибка')
-        driver.close() #И заново
-#Выводим статистику
-print('DDoS атака завершена \n ')
-abc = Counter(array)
-for key, value in abc.items():
-        print('Страница "' + str(key) + '"Ы просмотров ' + str(value))
+                print('Ошибка загрузки страницы')
+            driver.close()
+        count += 1
+        print(statistic(k, l, count))
+    except:
+        print('Ошибка загрузки или закрытия вебдрайвера')
